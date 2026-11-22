@@ -156,7 +156,7 @@ final class SwitchSynthesizer {
     ) -> SampleClip {
         var rng = XorShift64(seed: seed)
         let sr = sampleRate
-        let durationSec: Float = 0.115
+        let durationSec: Float = spec.springPingGain > 0.001 ? 0.165 : 0.120
         let count = Int(sr * durationSec)
         var out = [Float](repeating: 0, count: count)
 
@@ -531,7 +531,7 @@ final class SwitchSynthesizer {
 
         let finalScale = targetPeak / postPeak
         let fadeInLen = min(16, samples.count)
-        let fadeOutLen = min(360, samples.count)
+        let fadeOutLen = min(576, samples.count)
 
         for i in 0..<samples.count {
             var s = samples[i] * finalScale
