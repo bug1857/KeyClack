@@ -11,8 +11,6 @@ enum MenuTab: String, CaseIterable, Identifiable {
 /// Main Klack-inspired macOS menu bar popover interface.
 struct MenuBarContentView: View {
     @ObservedObject var appState: AppState
-    @State private var selectedTab: MenuTab = .switches
-    @State private var runningApps: [ExcludedApp] = []
 
     var body: some View {
         VStack(spacing: 0) {
@@ -35,7 +33,7 @@ struct MenuBarContentView: View {
             }
 
             // Tab Switcher
-            Picker("", selection: $selectedTab) {
+            Picker("", selection: $appState.selectedTab) {
                 ForEach(MenuTab.allCases) { tab in
                     Text(tab.rawValue).tag(tab)
                 }
@@ -49,7 +47,7 @@ struct MenuBarContentView: View {
             // Tab Body
             ScrollView {
                 Group {
-                    switch selectedTab {
+                    switch appState.selectedTab {
                     case .switches:
                         switchesTab
                     case .tune:
@@ -68,11 +66,11 @@ struct MenuBarContentView: View {
         }
         .frame(width: 368)
         .onAppear {
-            runningApps = ActiveAppMonitor.runningRegularApps()
+            appState.refreshRunningApps()
         }
-        .onChange(of: selectedTab) { tab in
+        .onChange(of: appState.selectedTab) { tab in
             if tab == .smartMute {
-                runningApps = ActiveAppMonitor.runningRegularApps()
+                appState.refreshRunningApps()
             }
         }
     }
@@ -614,9 +612,9 @@ struct MenuBarContentView: View {
                         .foregroundColor(.secondary)
                     Spacer()
                     Menu {
-                        if !runningApps.isEmpty {
+                        if !appState.runningApps.isEmpty {
                             Section(header: Text("Currently Running Apps")) {
-                                ForEach(runningApps) { app in
+                                ForEach(appState.runningApps) { app in
                                     Button(app.displayName) {
                                         appState.addExcludedApp(app)
                                     }
@@ -632,7 +630,7 @@ struct MenuBarContentView: View {
                         }
                         Divider()
                         Button("Refresh Running Apps") {
-                            runningApps = ActiveAppMonitor.runningRegularApps()
+                            appState.refreshRunningApps()
                         }
                     } label: {
                         Label("Add App", systemImage: "plus")

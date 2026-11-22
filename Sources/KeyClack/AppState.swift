@@ -42,6 +42,11 @@ final class AppState: ObservableObject {
     @Published var statusToast: String?
     @Published var launchAtLogin: Bool = LaunchAtLoginManager.isEnabled
 
+    // Menu bar popover UI state (stored here as @Published so building with standalone
+    // macOS Command Line Tools never requires the Xcode-only SwiftUIMacros plugin)
+    @Published var selectedTab: MenuTab = .switches
+    @Published var runningApps: [ExcludedApp] = []
+
     // Live keyboard visualizer state
     @Published var pressedKeyCodes: Set<UInt16> = []
     @Published var lastActivePan: Float = 0.0
@@ -253,6 +258,10 @@ final class AppState: ObservableObject {
             launchAtLogin = LaunchAtLoginManager.isEnabled
             importErrorMessage = error.localizedDescription
         }
+    }
+
+    func refreshRunningApps() {
+        runningApps = ActiveAppMonitor.runningRegularApps()
     }
 
     func addExcludedApp(_ app: ExcludedApp) {
