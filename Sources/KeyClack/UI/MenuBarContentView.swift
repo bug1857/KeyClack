@@ -40,12 +40,13 @@ struct MenuBarContentView: View {
             }
             .pickerStyle(.segmented)
             .labelsHidden()
+            .frame(maxWidth: .infinity)
             .padding(.horizontal, 14)
             .padding(.top, 10)
             .padding(.bottom, 8)
 
-            // Tab Body
-            ScrollView {
+            // Tab Body (explicit height required so macOS MenuBarExtra(.window) doesn't collapse ScrollView to 0)
+            ScrollView(.vertical, showsIndicators: true) {
                 Group {
                     switch appState.selectedTab {
                     case .switches:
@@ -57,14 +58,15 @@ struct MenuBarContentView: View {
                     }
                 }
                 .padding(.horizontal, 14)
-                .padding(.bottom, 12)
+                .padding(.vertical, 6)
             }
-            .frame(maxHeight: 410)
+            .frame(height: 430)
 
             Divider()
             footerSection
         }
-        .frame(width: 368)
+        .frame(width: 384)
+        .fixedSize(horizontal: true, vertical: true)
         .onAppear {
             appState.refreshRunningApps()
         }

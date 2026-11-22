@@ -87,6 +87,8 @@ echo "✅ Built: $APP_BUNDLE"
 
 if [[ "$INSTALL_FLAG" == "true" ]]; then
   echo "==> Installing to /Applications/$APP_NAME.app..."
+  killall "$APP_NAME" >/dev/null 2>&1 || true
+  sleep 0.4
   rm -rf "/Applications/$APP_NAME.app"
   cp -R "$APP_BUNDLE" "/Applications/$APP_NAME.app"
   echo "✅ Installed to /Applications/$APP_NAME.app"
