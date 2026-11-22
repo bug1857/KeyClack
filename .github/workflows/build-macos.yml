@@ -1,0 +1,44 @@
+name: Build KeyClack macOS App
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Universal KeyClack.app (Apple Silicon + Intel)
+        run: |
+          chmod +x build-app.sh
+          ./build-app.sh --universal
+
+      - name: Package KeyClack-macOS.zip
+        run: |
+          cd build
+          zip -r -y KeyClack-macOS.zip KeyClack.app
+
+      - name: Upload macOS App Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KeyClack-macOS
+          path: build/KeyClack-macOS.zip
+
+      - name: Publish GitHub Release on Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" build/KeyClack-macOS.zip \
+            --title "KeyClack ${GITHUB_REF_NAME}" \
+            --generate-notes

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22252E"/>
+      <stop offset="100%" stop-color="#12141A"/>
+    </linearGradient>
+    <linearGradient id="keyBase" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3C4252"/>
+      <stop offset="100%" stop-color="#232732"/>
+    </linearGradient>
+    <linearGradient id="keyTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F6F7FB"/>
+      <stop offset="100%" stop-color="#DCE0EB"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A45"/>
+      <stop offset="100%" stop-color="#FF4D6D"/>
+    </linearGradient>
+  </defs>
+  <!-- macOS squircle background -->
+  <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#bg)"/>
+  <!-- Subtle inner border -->
+  <rect x="80" y="80" width="864" height="864" rx="186" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="6"/>
+  <!-- Sound ripples -->
+  <circle cx="512" cy="496" r="355" fill="none" stroke="url(#accent)" stroke-width="10" stroke-opacity="0.22" stroke-dasharray="28 24"/>
+  <circle cx="512" cy="496" r="300" fill="none" stroke="url(#accent)" stroke-width="12" stroke-opacity="0.38"/>
+  <!-- Mechanical keycap base skirt -->
+  <rect x="236" y="264" width="552" height="516" rx="88" fill="url(#keyBase)"/>
+  <!-- Bottom bevel highlight -->
+  <rect x="242" y="270" width="540" height="504" rx="82" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="5"/>
+  <!-- Sculpted PBT keycap top dish -->
+  <rect x="292" y="294" width="440" height="398" rx="64" fill="url(#keyTop)"/>
+  <rect x="302" y="304" width="420" height="378" rx="56" fill="none" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="6"/>
+  <!-- Tactile switch stem legend ("K" + acoustic dot) -->
+  <path d="M424 404 V582 M424 498 L536 404 M472 460 L548 582" fill="none" stroke="#1C202B" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Coral accent indicator bar (like a custom artisan homing bar) -->
+  <rect x="444" y="630" width="136" height="18" rx="9" fill="url(#accent)"/>
+</svg>
