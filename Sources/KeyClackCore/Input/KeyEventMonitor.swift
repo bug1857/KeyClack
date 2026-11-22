@@ -13,8 +13,8 @@ final class KeyEventMonitor {
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var permissionRetryTimer: Timer?
+    private var wakeObserver: NSObjectProtocol?
 
-    private var heldRegularKeys: Set<UInt16> = []
     private var heldModifiers: Set<UInt16> = []
 
     /// Returns true if macOS Input Monitoring permission has been granted.
@@ -38,6 +38,7 @@ final class KeyEventMonitor {
     /// Starts listening for global key events. If permission is missing, polls lightly until granted.
     func start() {
         stop()
+        observeSystemWake()
         if installTap() {
             onPermissionChanged?(true)
         } else {
@@ -50,6 +51,11 @@ final class KeyEventMonitor {
         permissionRetryTimer?.invalidate()
         permissionRetryTimer = nil
 
+        if let wakeObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(wakeObserver)
+            self.wakeObserver = nil
+        }
+
         if let tap = eventTap {
             CGEvent.tapEnable(tap: tap, enable: false)
         }
@@ -61,12 +67,27 @@ final class KeyEventMonitor {
             CFMachPortInvalidate(tap)
             eventTap = nil
         }
-        heldRegularKeys.removeAll()
         heldModifiers.removeAll()
     }
 
     deinit {
         stop()
+    }
+
+    private func observeSystemWake() {
+        wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            self.heldModifiers.removeAll()
+            if let tap = self.eventTap {
+                CGEvent.tapEnable(tap: tap, enable: true)
+            } else if Self.hasPermission, self.installTap() {
+                self.onPermissionChanged?(true)
+            }
+        }
     }
 
     private func startPermissionWatcher() {
@@ -130,14 +151,12 @@ final class KeyEventMonitor {
         switch type {
         case .keyDown:
             let isAutoRepeat = event.getIntegerValueField(.keyboardEventAutorepeat) != 0
-            if ignoreKeyRepeat && (isAutoRepeat || heldRegularKeys.contains(keyCode)) {
+            if ignoreKeyRepeat && isAutoRepeat {
                 return
             }
-            heldRegularKeys.insert(keyCode)
             onKeyEvent?(keyCode, true)
 
         case .keyUp:
-            heldRegularKeys.remove(keyCode)
             onKeyEvent?(keyCode, false)
 
         case .flagsChanged:

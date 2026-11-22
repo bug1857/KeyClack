@@ -24,7 +24,7 @@ enum MuteReason: Equatable {
 /// Central observable state coordinating audio playback, global keyboard capture,
 /// Smart Mute monitors, imported sound packs, and persisted user settings.
 @MainActor
-final class AppState: ObservableObject {
+public final class AppState: ObservableObject {
     @Published var settings: AppSettings {
         didSet {
             settings.save()
@@ -74,7 +74,7 @@ final class AppState: ObservableObject {
         return nil
     }
 
-    var isActivelyPlaying: Bool {
+    public var isActivelyPlaying: Bool {
         muteReason == nil && hasInputPermission
     }
 
@@ -87,7 +87,7 @@ final class AppState: ObservableObject {
         }
     }
 
-    init() {
+    public init() {
         let loaded = AppSettings.load()
         self.settings = loaded
         self.importedPacks = SoundPackImporter.listImportedPacks()

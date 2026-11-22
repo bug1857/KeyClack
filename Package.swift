@@ -10,9 +10,19 @@ let package = Package(
         .executable(name: "KeyClack", targets: ["KeyClack"])
     ],
     targets: [
+        .target(
+            name: "KeyClackCore",
+            path: "Sources/KeyClackCore"
+        ),
         .executableTarget(
             name: "KeyClack",
+            dependencies: ["KeyClackCore"],
             path: "Sources/KeyClack"
+        ),
+        .testTarget(
+            name: "KeyClackTests",
+            dependencies: ["KeyClackCore"],
+            path: "Tests/KeyClackTests"
         )
     ]
 )

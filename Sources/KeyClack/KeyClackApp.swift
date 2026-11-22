@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import KeyClackCore
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {

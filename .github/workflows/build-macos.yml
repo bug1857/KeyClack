@@ -1,4 +1,4 @@
-name: Build KeyClack macOS App
+name: Build & Test KeyClack (macOS)
 
 on:
   push:
@@ -18,10 +18,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Run Swift XCTest Suite on macOS
+        run: swift test --verbose
+
       - name: Build Universal KeyClack.app (Apple Silicon + Intel)
         run: |
           chmod +x build-app.sh
           ./build-app.sh --universal
+
+      - name: Verify Universal Binary, Signature, and App Icon
+        run: |
+          set -euo pipefail
+          lipo -info build/KeyClack.app/Contents/MacOS/KeyClack | grep -q "arm64"
+          lipo -info build/KeyClack.app/Contents/MacOS/KeyClack | grep -q "x86_64"
+          test -f build/KeyClack.app/Contents/Resources/AppIcon.icns
+          codesign --verify --deep --strict build/KeyClack.app
+          echo "✅ Verified Universal arm64 + x86_64 binary, AppIcon.icns, and code signature."
 
       - name: Package KeyClack-macOS.zip
         run: |
@@ -41,4 +53,13 @@ jobs:
         run: |
           gh release create "${GITHUB_REF_NAME}" build/KeyClack-macOS.zip \
             --title "KeyClack ${GITHUB_REF_NAME}" \
-            --generate-notes
+            --notes "Free, ultra-low-latency native macOS mechanical keyboard simulator (Universal Apple Silicon + Intel).
+
+### Quick Install
+1. Download **KeyClack-macOS.zip** below and unzip it.
+2. Drag **KeyClack.app** into **/Applications**.
+3. Run once in Terminal to clear macOS's download quarantine flag (ad-hoc signed, not notarized):
+   \`\`\`bash
+   xattr -cr /Applications/KeyClack.app && open /Applications/KeyClack.app
+   \`\`\`
+4. Click the keyboard icon in your menu bar → **Grant Permission in System Settings** → enable **KeyClack** under **Privacy & Security → Input Monitoring**."

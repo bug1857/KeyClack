@@ -9,10 +9,14 @@ enum MenuTab: String, CaseIterable, Identifiable {
 }
 
 /// Main Klack-inspired macOS menu bar popover interface.
-struct MenuBarContentView: View {
+public struct MenuBarContentView: View {
     @ObservedObject var appState: AppState
 
-    var body: some View {
+    public init(appState: AppState) {
+        self._appState = ObservedObject(wrappedValue: appState)
+    }
+
+    public var body: some View {
         VStack(spacing: 0) {
             headerSection
             Divider()

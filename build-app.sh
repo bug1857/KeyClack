@@ -87,10 +87,19 @@ echo "✅ Built: $APP_BUNDLE"
 
 if [[ "$INSTALL_FLAG" == "true" ]]; then
   echo "==> Installing to /Applications/$APP_NAME.app..."
+  WAS_INSTALLED=false
+  if [[ -d "/Applications/$APP_NAME.app" ]]; then
+    WAS_INSTALLED=true
+  fi
   killall "$APP_NAME" >/dev/null 2>&1 || true
   sleep 0.4
   rm -rf "/Applications/$APP_NAME.app"
   cp -R "$APP_BUNDLE" "/Applications/$APP_NAME.app"
+  if [[ "$WAS_INSTALLED" == "true" ]]; then
+    # Clear stale ad-hoc CDHash from Input Monitoring so macOS won't silently block the rebuilt binary
+    tccutil reset ListenEvent com.keyclack.app >/dev/null 2>&1 || true
+    echo "ℹ️  Updated existing app — please re-enable KeyClack once in System Settings → Privacy & Security → Input Monitoring."
+  fi
   echo "✅ Installed to /Applications/$APP_NAME.app"
   echo "==> Launching $APP_NAME..."
   open "/Applications/$APP_NAME.app"
